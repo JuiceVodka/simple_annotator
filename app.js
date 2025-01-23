@@ -13,11 +13,11 @@ const prevButton = document.getElementById('prev');
 const ctx = canvas.getContext('2d');
 const clicksList = document.getElementById('clicksList');
 const done_button = document.getElementById('done');
-const stat = document.getElementById('status');
 const post_button = document.getElementById('post');
 const annotator_select = document.getElementById('annotator_group');
 const navbuttons = document.getElementById('navbuttons');
 const databuttons = document.getElementById('databuttons');
+const stat = [document.getElementById('status1'), document.getElementById('status2'), document.getElementById('status3'), document.getElementById('status4')];
 
 
 //other constants and storage variables
@@ -188,7 +188,7 @@ canvas.addEventListener('click', (event) => {
         console.log("Band: ", band)
 
         const base_tone = staff.clef == "TREBLE" ? 2 : 4
-        const base_octave = staff.clef == "TREBLE" ? 4 : 3 //note on guitar it is written one octave higher
+        const base_octave = staff.clef == "TREBLE" ? 4 : 2 //note on guitar it is written one octave higher
 
         const tones = ["C", "D", "E", "F", "G", "A", "B"]
 
@@ -383,6 +383,11 @@ nextButton.addEventListener('click', () => {
         ctx.drawImage(image, 0, 0);
         updateUi();
     };
+    staff = 0;
+    initial_staff_click = [-1, -1];
+    final_staff_click = [-1, -1];
+    staffData.length = 0;
+    stage = 0;
 });
 
 prevButton.addEventListener('click', () => {
@@ -399,6 +404,11 @@ prevButton.addEventListener('click', () => {
         ctx.drawImage(image, 0, 0);
         updateUi();
     };
+    staff = 0;
+    initial_staff_click = [-1, -1];
+    final_staff_click = [-1, -1];
+    staffData.length = 0;
+    stage = 0;
 });
 
 saveButton.addEventListener('click', () => {
@@ -758,8 +768,13 @@ function updateButtons() {
     redoButton.disabled = undoneClicks.length === 0;
     nextButton.disabled = current_page === last_page;
     prevButton.disabled = current_page === first_page;
-
     done_button.disabled = staff === 0;
+
+    undoButton.className = undoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
+    redoButton.className = redoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
+    nextButton.className = nextButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
+    prevButton.className = prevButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
+    done_button.className = done_button.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
 }
 
 function clearCanvas() {
@@ -778,6 +793,18 @@ function clearTextFields(){
     }
 }
 
+
+function handleProgressBar(){
+    stat[stage].style.visibility = "visible";
+    stat[stage].className = "progress-bar w-25 bg-info";
+    for (let i = 0; i < stage; i++){
+        stat[i].className = "progress-bar w-25 bg-success";
+    }
+    for (let i = stage + 1; i < 4; i++){
+        stat[i].style.visibility = "hidden";
+    }
+}
+
 function updateUi(){
     clearCanvas();
     updateButtons();
@@ -786,5 +813,7 @@ function updateUi(){
     clickData.forEach(click => {
         drawMarker(click.x, click.y);
     });
-    stat.textContent = `Current stage: ${annotation_stages[stage]}`;
+
+    handleProgressBar();
+    //stat.textContent = `Current stage: ${annotation_stages[stage]}`;
 }

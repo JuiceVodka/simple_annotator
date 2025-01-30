@@ -21,16 +21,16 @@ const stat = [document.getElementById('status1'), document.getElementById('statu
 
 
 //other constants and storage variables
-const annotator_groups = 5
+const annotator_groups = 10;
 const first_page_static = 63;
 const last_page_static = 181;
 var first_page = 63; 
 var last_page = 181;
 var current_page = 63;
 //todo tweak this
-var wrap_around_last_page = 73;
 
 var page_overflow = 0;
+var group = 0;
 
 var staff = 0;
 var annotatingStaff = true 
@@ -97,19 +97,21 @@ async function updatePostButton() {
 
 
 function handleGroup(){
-    let group = annotator_select.groups.value
-    let pageIntervals = Math.round((last_page_static - first_page_static) / annotator_groups)*2
+    group = annotator_select.groups.value
+    let pageIntervals = ((last_page_static - first_page_static) / annotator_groups)*2 //its 24
     console.log("interval: ", pageIntervals)
-    wrap_around_last_page = first_page_static + Math.round(pageIntervals/2)
 
 
-
-    first_page = first_page_static + (group - 1) * Math.round(pageIntervals/2)
-    last_page = first_page + pageIntervals 
+    first_page = Math.round(first_page_static + (group - 1) * (pageIntervals/2))
+    last_page = Math.round((first_page + pageIntervals)%(last_page_static+1))
+    if (last_page < first_page_static){
+        last_page += first_page_static
+    }
 
     console.log("First page: ", first_page, "Last page: ", last_page)
 
     current_page = first_page
+
     clearCanvas()
     clearTextFields()
     image.src = images_dir + "page" + current_page + ".png";
@@ -373,7 +375,14 @@ nextButton.addEventListener('click', () => {
     clickData.length = 0;
     undoneClicks.length = 0;
     clicksList.innerHTML = '';
-    current_page += 1;
+
+    if (group == 10 && current_page == last_page_static){
+        current_page = first_page_static
+    }else{
+        current_page += 1;
+    }
+
+
     image.src = images_dir + "page" + current_page + ".png";
     image.onload = function() {
         canvas.width = image.width;
@@ -394,7 +403,12 @@ prevButton.addEventListener('click', () => {
     clickData.length = 0;
     undoneClicks.length = 0;
     clicksList.innerHTML = '';
-    current_page -= 1;
+
+    if (group == 10 && current_page == first_page_static){
+        current_page = last_page_static
+    }else{
+        current_page -= 1;
+    }
     image.src = images_dir + "page" + current_page + ".png";
     image.onload = function() {
         canvas.width = image.width;
@@ -493,35 +507,51 @@ post_button.addEventListener('click', async () => {
 // ----------------- Functions -----------------
 function inputStaffSpecifics(){
     const container = document.createElement('div');
-    container.class = 'staff-input-container';
     container.className = "staff-input-container";
     container.style.position = 'absolute';
     container.style.border = '1px solid #000';
     container.style.backgroundColor = '#fff';
-    container.style.left = `${canvas.width/2}px`;
-    container.style.top = `${canvas.height/2}px`;
+    container.style.left = `${canvas.width / 2}px`;
+    container.style.top = `${canvas.height / 2}px`;
     container.style.padding = '10px';
     container.style.paddingTop = '0px';
 
-    const instruction = document.createElement('p');
+    // Add a shared class to normalize input heights
+    const normalizeHeight = "form-control text-start w-auto custom-input"; 
+
+    const instruction = document.createElement('div');
     instruction.textContent = 'Enter the clef of the staff (treble, bass, alto, etc):';
+    instruction.className = 'mt-2';
+
     const input = document.createElement('input');
     input.type = 'text';
+    input.className = normalizeHeight;  // ✅ Consistent class
 
-    const instruction2 = document.createElement('p');
+    const instruction2 = document.createElement('div');
     instruction2.textContent = 'Enter the sharps and flats of the staff (e.g. F#, C#, Bb, etc):';
+    instruction2.className = 'mt-2';
+
     const input2 = document.createElement('input');
     input2.type = 'text';
+    input2.className = normalizeHeight;  // ✅ Consistent class
 
-    const instruction3 = document.createElement('p');
+    const instruction3 = document.createElement('div');
     instruction3.textContent = 'Enter the time signature of the staff (e.g. 4/4, 3/4, 6/8, etc):';
+    instruction3.className = 'mt-2';
+
     const input3 = document.createElement('input');
     input3.type = 'text';
+    input3.className = normalizeHeight;  // ✅ Consistent class
+
+    const buttongroup = document.createElement('div');
+    buttongroup.className = "d-flex gap-2 mt-2"; 
 
     const submitButton = document.createElement('button');
+    submitButton.className = 'btn btn-outline-secondary';
     submitButton.textContent = 'Ok';
 
     const cancelButton = document.createElement('button');
+    cancelButton.className = 'btn btn-outline-secondary';
     cancelButton.textContent = 'Cancel';
 
     container.appendChild(instruction);
@@ -529,9 +559,11 @@ function inputStaffSpecifics(){
     container.appendChild(instruction2);
     container.appendChild(input2);
     container.appendChild(instruction3);
-    container.appendChild(input3);
-    container.appendChild(submitButton);
-    container.appendChild(cancelButton);
+
+    buttongroup.appendChild(input3);
+    buttongroup.appendChild(submitButton);
+    buttongroup.appendChild(cancelButton);
+    container.appendChild(buttongroup);
 
     document.body.appendChild(container);
 
@@ -545,6 +577,7 @@ function inputStaffSpecifics(){
         staff = 0;
         initial_staff_click = [-1, -1];
         final_staff_click = [-1, -1];
+        updateUi();
     });
 
     // Handle submission via Enter key
@@ -594,28 +627,44 @@ function displayTextbox(x, y, recomendation) {
     container.style.padding = '10px';
     container.style.paddingTop = '0px';
 
+    // Common class for styling inputs
+    const inputClass = "form-control text-start w-auto custom-input"; 
+
     // Create instructions and input fields
-    const instruction1 = document.createElement('p');
+    const instruction1 = document.createElement('div');
     instruction1.textContent = 'Enter the tone height (B4, C#2, etc):';
+    instruction1.className = 'mt-2';
+
     const input1 = document.createElement('input');
     input1.type = 'text';
     input1.value = recomendation;
+    input1.className = inputClass; // Apply consistent styling
 
-    const instruction2 = document.createElement('p');
+    const instruction2 = document.createElement('div');
     instruction2.textContent = 'Enter the tone duration (1, 4, 8, 16 etc):';
+    instruction2.className = 'mt-2';
+
+    const input2Group = document.createElement('div'); // Wrapper for input & button
+    input2Group.className = "d-flex gap-2 align-items-center"; // Aligns input & button
+
     const input2 = document.createElement('input');
     input2.type = 'text';
+    input2.className = inputClass; // Apply consistent styling
 
     // Create a submit button
     const submitButton = document.createElement('button');
     submitButton.textContent = 'Ok';
+    submitButton.className = 'btn btn-outline-secondary';
+
+    // Append input and button inline
+    input2Group.appendChild(input2);
+    input2Group.appendChild(submitButton);
 
     // Append elements to the container
     container.appendChild(instruction1);
     container.appendChild(input1);
     container.appendChild(instruction2);
-    container.appendChild(input2);
-    container.appendChild(submitButton);
+    container.appendChild(input2Group); // Inline input + button
 
     // Add the container to the body
     document.body.appendChild(container);
@@ -672,17 +721,32 @@ function displayTextboxRest(x, y) {
     container.style.padding = '10px';
     container.style.paddingTop = '0px';
 
-    const instruction1 = document.createElement('p');
+    // Common class for consistent input styling
+    const inputClass = "form-control text-start w-auto custom-input"; 
+
+    const instruction1 = document.createElement('div');
     instruction1.textContent = 'Enter the rest duration (1, 4, 8, 16 etc):';
+    instruction1.className = 'mt-2';
+
+    // Wrapper for input and button (keeps them inline)
+    const inputGroup = document.createElement('div');
+    inputGroup.className = "d-flex gap-2 align-items-center mt-2"; // Inline layout
+
     const input1 = document.createElement('input');
     input1.type = 'text';
+    input1.className = inputClass; // Consistent input style
 
     const submitButton = document.createElement('button');
     submitButton.textContent = 'Ok';
+    submitButton.className = 'btn btn-outline-secondary';
 
+    // Append input and button inside the wrapper
+    inputGroup.appendChild(input1);
+    inputGroup.appendChild(submitButton);
+
+    // Append elements to the container
     container.appendChild(instruction1);
-    container.appendChild(input1);
-    container.appendChild(submitButton);
+    container.appendChild(inputGroup); // Inline input + button
 
     document.body.appendChild(container);
 
@@ -769,6 +833,7 @@ function updateButtons() {
     nextButton.disabled = current_page === last_page;
     prevButton.disabled = current_page === first_page;
     done_button.disabled = staff === 0;
+    clearButton.disabled = clickData.length === 0;
 
     undoButton.className = undoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
     redoButton.className = redoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';

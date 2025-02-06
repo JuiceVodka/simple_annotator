@@ -19,6 +19,12 @@ const navbuttons = document.getElementById('navbuttons');
 const databuttons = document.getElementById('databuttons');
 const stat = [document.getElementById('status1'), document.getElementById('status2'), document.getElementById('status3'), document.getElementById('status4')];
 
+const confirmClear = document.getElementById('confirmClear');
+
+
+const toneNums = [0, 0.5, 1, 1.5, 2, 3, 3.5, 4, 4.5, 5, 5.5, 6];
+const toneNamesUp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const toneNamesDown = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
 //other constants and storage variables
 const annotator_groups = 10;
@@ -199,7 +205,8 @@ canvas.addEventListener('click', (event) => {
         console.log(base_octave + (band>=3) - (band <= -5))
         console.log(staff.clef == "TREBLE")
 
-
+        const height = toneNums.indexOf(base_tone + band < 0 ? base_tone+band+7 : (base_tone + band) % 7)
+        const octavenum = staff.clef == "TREBLE" ? base_octave + (band>=5) - (band <= -3) : base_octave + (band>=3) - (band <= -5)
         const tone = tones[base_tone + band < 0 ? base_tone+band+7 : (base_tone + band) % 7]
         const octave = staff.clef == "TREBLE" ? base_octave + (band>=5) - (band <= -3) : base_octave + (band>=3) - (band <= -5)
 
@@ -208,7 +215,7 @@ canvas.addEventListener('click', (event) => {
         console.log("Band: ", band, "Tone: ", tone, "Octave: ", octave, "Recomendation: ", recomendation)
         // check if the click is inside the staff box with margin
         if (x >= initial_staff_click[0] && x <= final_staff_click[0] && y >= initial_staff_click[1] - staff.margin_vertical && y <= final_staff_click[1] + staff.margin_vertical) {
-            displayTextbox(x, y, recomendation);
+            displayTextbox(x, y, recomendation, height, octavenum);
         }
     } else if (stage == 2) { // annoting rests
         // clear the undo list
@@ -346,9 +353,9 @@ redoButton.addEventListener('click', () => {
     updateClicksList(lastUndoneClick.x, lastUndoneClick.y);
 });
 
-// Event listener for clear button
-clearButton.addEventListener('click', () => {
 
+confirmClear.addEventListener('click', () => {
+    
     // Clear the clicks array
     clickData.length = 0;
 
@@ -615,7 +622,8 @@ function saveStaffSpecifics(container, clef, key, time){
 
 }
 
-function displayTextbox(x, y, recomendation) {
+//for note annotation
+function displayTextbox(x, y, recomendation, tone, octave) {
     // Create a div container dynamically
     const container = document.createElement('div');
     container.className = 'input-container';
@@ -632,7 +640,9 @@ function displayTextbox(x, y, recomendation) {
 
     // Create instructions and input fields
     const instruction1 = document.createElement('div');
-    instruction1.textContent = 'Enter the tone height (B4, C#2, etc):';
+    instruction1.setAttribute('style', 'white-space: pre;');
+    instruction1.textContent = 'Enter the tone height (B4, C#2, etc):\r\n';
+    instruction1.textContent += 'Use the up and down arrows to change the tone';
     instruction1.className = 'mt-2';
 
     const input1 = document.createElement('input');
@@ -681,12 +691,33 @@ function displayTextbox(x, y, recomendation) {
             saveInputs(container, x, y, input1.value.toUpperCase(), input2.value.toUpperCase());
         }
     });
+
+    // handle changing note heights with the up and down arrows
+    container.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowUp') {
+            tone += 1
+            if (tone > 11){
+                tone = 0
+                octave += 1
+            }
+            recomendation = `${toneNamesUp[tone]}${octave}`
+            input1.value = recomendation
+        }else if (event.key === 'ArrowDown') {
+            tone -= 1
+            if (tone < 0){
+                tone = 11
+                octave -= 1
+            }
+            recomendation = `${toneNamesDown[tone]}${octave}`
+            input1.value = recomendation
+        }
+    });
 }
 
 
 function saveInputs(container, x, y, tone, duration) {
-    const re1 = /[A-G](#|B)?[0-9]/
-    const re2 = /(1|2|4|8|16|32|64)/
+    const re1 = /^[A-G](#|B)?[0-9]$/;
+    const re2 = /^\d{1,2}$/;
 
     // Validate and save the input values
     if (re1.test(tone.trim()) && re2.test(duration.trim())) {
@@ -698,7 +729,6 @@ function saveInputs(container, x, y, tone, duration) {
 
         // Remove the form container
         container.remove();
-        //updateButtons();
         updateUi();
         
     } else {
@@ -762,7 +792,7 @@ function displayTextboxRest(x, y) {
 }
 
 function saveRestInputs(container, x, y, duration) {
-    const re1 = /(1|2|4|8|16|32|64)/
+    const re1 = /^\d{1,2}$/;
 
     if (re1.test(duration.trim())) {
         clickData.push({ x, y, duration });
@@ -837,6 +867,7 @@ function updateButtons() {
 
     undoButton.className = undoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
     redoButton.className = redoButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
+    clearButton.className = clearButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
     nextButton.className = nextButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
     prevButton.className = prevButton.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
     done_button.className = done_button.disabled ? 'btn btn-outline-secondary' : 'btn btn-outline-primary';
@@ -880,5 +911,4 @@ function updateUi(){
     });
 
     handleProgressBar();
-    //stat.textContent = `Current stage: ${annotation_stages[stage]}`;
 }

@@ -16,7 +16,6 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">-->
 </head>
 <body class="container-fluid bg-body-tertiary">
     <div style="display:flex; justify-content: space-between; align-items: center;">
@@ -50,7 +49,7 @@
             <button id="redo" class="btn btn-outline-secondary">
                 <img src="assets/redo-16-32.png" alt="redo" title="redo" style="width: 25px; height: 25px;">
             </button>
-            <button id="clear" class="btn btn-outline-secondary">
+            <button id="clear" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 <img src="assets/clear-5-32.png" alt="clear" title="clear" style="width: 25px; height: 25px;">
             </button>
         </span>
@@ -150,7 +149,7 @@
                         <a class="collapsible btn btn-secondary" data-bs-toggle="collapse" href="#collapseNotes" role="button" aria-expanded="false" aria-controls="collapseNotes">Note annotation</a>
                     </div>
                     <div class="collapse" id="collapseNotes">
-                        <span class="card card-body">Anotating notes follows the staff annotation. Simply click on note heads to annotate them. In the popup window you must enter the tone and the duration of the note. A tone suggestion is already preapared, but will sometimes need to be changed. Add any charps and flats to the note name (Per example C#4 or Db3). The note diration is written as the bottom part of the note fraction. Per example a quarter note would have duration 4, an eight note would have duration 8. After annotating all the notes in the staff click "Done" to move to the next stage.
+                        <span class="card card-body">Anotating notes follows the staff annotation. Simply click on note heads to annotate them. In the popup window you must enter the tone and the duration of the note. A tone suggestion is already preapared, but will sometimes need to be changed. Tones can also be changed by using the arrow keys (up increases the tone by hald a note, down decreases the tone by hald a note). Add any charps and flats to the note name (Per example C#4 or Db3). The note diration is written as the bottom part of the note fraction. Per example a quarter note would have duration 4, an eight note would have duration 8. After annotating all the notes in the staff click "Done" to move to the next stage.
                             <img src="./assets/tutorial-notes.gif" width="450" height="340">
                         </span>
                     </div>
@@ -220,6 +219,27 @@
         </span>
     </div> -->
 
+
+  
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Clear</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Clearing will erase all data within the current annotation stage.<br>Are you sure you want to clear?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmClear" data-bs-dismiss="modal">Yes, clear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button id="post" class="btn btn-outline-secondary" style="visibility: hidden;">Post</button>
     <ul id="clicksList" style="visibility: hidden;"></ul>
     <script src="app.js"></script>
@@ -234,5 +254,6 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 </body>
 </html>

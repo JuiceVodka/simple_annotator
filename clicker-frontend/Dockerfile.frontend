@@ -1,0 +1,17 @@
+# Use the official Nginx base image
+FROM nginx:latest
+
+# Remove the default Nginx static files
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy your frontend files to the Nginx web directory
+COPY . /usr/share/nginx/html
+
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80 to serve the frontend
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]

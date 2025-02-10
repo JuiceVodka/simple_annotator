@@ -1,1 +1,8 @@
 /clicker-backend/node_modules/
+clicker-backend/package-lock.json
+clicker-backend/package.json
+helper_functions.mjs
+output.musicxml
+page63.json
+parser.py
+test.scss

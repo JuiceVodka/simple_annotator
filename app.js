@@ -104,6 +104,10 @@ async function updatePostButton() {
 
 function handleGroup(){
     group = annotator_select.groups.value
+    if (group == "default"){
+        console.log("Wrong option")
+        return
+    }
     let pageIntervals = ((last_page_static - first_page_static) / annotator_groups)*2 //its 24
     console.log("interval: ", pageIntervals)
 
@@ -717,7 +721,7 @@ function displayTextbox(x, y, recomendation, tone, octave) {
 
 function saveInputs(container, x, y, tone, duration) {
     const re1 = /^[A-G](#|B)?[0-9]$/;
-    const re2 = /^\d{1,2}$/;
+    const re2 = /^(0|\d){1,2}(\.\d)?$/;
 
     // Validate and save the input values
     if (re1.test(tone.trim()) && re2.test(duration.trim())) {
@@ -792,7 +796,7 @@ function displayTextboxRest(x, y) {
 }
 
 function saveRestInputs(container, x, y, duration) {
-    const re1 = /^\d{1,2}$/;
+    const re1 = /^(0|\d){1,2}(\.\d)?$/;
 
     if (re1.test(duration.trim())) {
         clickData.push({ x, y, duration });

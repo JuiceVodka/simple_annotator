@@ -84,7 +84,7 @@ window.onload = () => {
 
 async function checkBackendStatus() {
     try {
-        const response = await fetch('http://localhost:3000/running');
+        const response = await fetch('/api/running');
         console.log(response);
         if (response.ok) {
             return true; // Backend is running
@@ -99,6 +99,7 @@ async function updatePostButton() {
     const backendRunning = await checkBackendStatus();
     post_button.disabled = !backendRunning;
     console.log('Backend running:', backendRunning);
+    console.log("TESTESTESTEST")
 }
 
 
@@ -494,7 +495,7 @@ done_button.addEventListener('click', () => {
 
 post_button.addEventListener('click', async () => {
     const data = JSON.stringify(staffData, null, 2);
-    const response = await fetch("http://localhost:3000/annotate-staff", {
+    const response = await fetch("/api/annotate-staff", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: data

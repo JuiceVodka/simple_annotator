@@ -63,11 +63,11 @@ const Image = mongoose.model('Image', ImageSchema);
 // API Endpoints
 
 // Save annotated staff data
-app.post('/annotate-staff', async (req, res) => {
+app.post('/api/annotate-staff', async (req, res) => {
     const staffData = req.body;
-    console.log(staffData);
-    console.log(staffData[0].notes);
-    console.log(staffData[0].rests);
+    //console.log(staffData);
+    //console.log(staffData[0].notes);
+    //console.log(staffData[0].rests);
     try {
     // Validate the data
         if (!Array.isArray(staffData) || staffData.length === 0) {
@@ -85,7 +85,7 @@ app.post('/annotate-staff', async (req, res) => {
     }
 });
 
-app.post('/save-image', async (req, res) => {
+app.post('/api/save-image', async (req, res) => {
     const { staffId, image } = req.body;
   
     try {
@@ -103,7 +103,7 @@ app.post('/save-image', async (req, res) => {
 });
 
 // Fetch all annotated staff data
-app.get('/annotate-staff', async (req, res) => {
+app.get('/api/annotate-staff', async (req, res) => {
   try {
     const data = await Staff.find();
     res.status(200).send(data);
@@ -114,22 +114,23 @@ app.get('/annotate-staff', async (req, res) => {
 });
 
 //default display
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     res.send(`
       <h1>Welcome to the Music Annotation API</h1>
       <p>Available endpoints:</p>
       <ul>
-        <li><a href="/annotate-staff">/annotate-staff</a> - View staff annotations</li>
-        <li><a href="/api-docs">/api-docs</a> - API documentation (if using Swagger)</li>
+        <li><a href="/api/annotate-staff">/annotate-staff</a> - View staff annotations</li>
+        <li><a href="/api/api-docs">/api-docs</a> - API documentation (if using Swagger)</li>
+        <li><a>/annotate-staff dl</a> - Download the staff annotations</li>
       </ul>
     `);
 });
 
-app.get("/running", (req, res) => {
+app.get("/api/running", (req, res) => {
     res.status(200).json({status: "running"});
 });
 
-app.delete('/annotate-staff', async (req, res) => {
+app.delete('/api/annotate-staff', async (req, res) => {
   try {
     await Staff.deleteMany();
     res.status(200).send({ success: true });

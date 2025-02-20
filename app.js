@@ -600,7 +600,7 @@ function inputStaffSpecifics(){
 }
 
 function saveStaffSpecifics(container, clef, key, time){ 
-    const re1 = /^(TREBLE|BASS|ALTO|TENOR)$/
+    const re1 = /^(TREBLE|BASS|ALTO|TENOR|SOPRANO)$/
     const re2 = /^(([A-G](#|B))|[A-G](#|B)(, [A-G](#|B)){0,7})?$/
     const re3 = /^([0-9]\/[0-9])?$/
 

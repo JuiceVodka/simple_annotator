@@ -721,7 +721,7 @@ function displayTextbox(x, y, recomendation, tone, octave) {
 
 function saveInputs(container, x, y, tone, duration) {
     const re1 = /^[A-G](#|B)?[0-9]$/;
-    const re2 = /^((0|\d){1,2}((\.|,)\d)?(\.)?(-)?)?$/;
+    const re2 = /^((0|\d){1,2}((\.|,)\d)?(\.)*(-)?)?$/;
 
     // Validate and save the input values
     if (re1.test(tone.trim()) && re2.test(duration.trim())) {
@@ -796,7 +796,7 @@ function displayTextboxRest(x, y) {
 }
 
 function saveRestInputs(container, x, y, duration) {
-    const re1 = /^((0|\d){1,2}((\.|,)\d)?(\.)?(-)?)?$/;
+    const re1 = /^((0|\d){1,2}((\.|,)\d)?(\.)*(-)?)?$/;
 
     if (re1.test(duration.trim())) {
         clickData.push({ x, y, duration });

@@ -687,7 +687,7 @@ function displayTextbox(x, y, recomendation, tone, octave) {
     input1.focus();
 
     // Handle form submission
-    submitButton.addEventListener('click', () => saveInputs(container, x, y, input1.value, input2.value));
+    submitButton.addEventListener('click', () => saveInputs(container, x, y, input1.value.toUpperCase(), input2.value.toUpperCase()));
 
     // Handle submission via Enter key
     input2.addEventListener('keydown', (event) => {
@@ -720,7 +720,7 @@ function displayTextbox(x, y, recomendation, tone, octave) {
 
 
 function saveInputs(container, x, y, tone, duration) {
-    const re1 = /^[A-G](#|B)?[0-9]$/;
+    const re1 = /^[A-G](#|B)*[0-9]$/;
     const re2 = /^((0|\d){1,2}((\.|,)\d)?(\.)*(-)?)?$/;
 
     // Validate and save the input values
